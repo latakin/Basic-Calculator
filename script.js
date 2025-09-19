@@ -9,12 +9,13 @@ function add(a,b) {
 
 
 function subtract(a,b) {
-    if(b === 0) {
-        return "syntax error"
-    }
+   
     return a - b;
 }
 function divide(a,b) {
+     if(b === 0) {
+        return "syntax error"
+    }
     return a / b;
 }
 function multiply(a,b) {
@@ -24,6 +25,9 @@ function multiply(a,b) {
 function calculate(previousNumber, currentNumber, operator ) {
     previousNumber = parseInt(previousNumber);
     currentNumber = parseInt(currentNumber);
+    if(!operator) {
+        return undefined;
+    }
     if(operator === '+') {
         return add(previousNumber,currentNumber);
     } else if(operator === '-') {
@@ -37,7 +41,8 @@ function calculate(previousNumber, currentNumber, operator ) {
 }
 
 function updateDisplay(value) {
-    document.getElementById('display').textContent = value;
+    const displayvalue = value === undefined  || value === null ? '0' : value;
+    document.getElementById('display').textContent = displayvalue;
 }
 
 function clear() {
@@ -57,24 +62,29 @@ function handleNumberButton(digit) {
 }
 
 function handleoperatorButton(op) {
-    if(!currentNumber &&  !previousNumbeer) {
+    if(!currentNumber &&  !previousNumber) {
         return;
     }
     
-    if (currentNumber && previousNumber) {
+    if (currentNumber && previousNumber && operator) {
         const result = calculate(previousNumber, currentNumber, operator);
         if (result === 'Error' ) {
             updateDisplay('Error');
             clear();
             return;
         }
+        if(result !== undefined) {
+            previousNumber =result;
+            currentNumber = "";
+            updateDisplay(result);
 
-        previousNumber =result;
-        currentNumber = "";
-        updateDisplay(result);
-
+        }
+        
     } else if (currentNumber) {
-        previousNumber = currentNumber;
+        if(!previousNumber) {
+            previousNumber = currentNumber;
+        }
+        
         currentNumber = "";
     }
 
@@ -124,9 +134,14 @@ document.getElementById('clear').addEventListener('click', () => {
 })
 
 function handleBackspace() {
+    
     if (currentNumber) {
         currentNumber = currentNumber.slice(0, -1);
         updateDisplay(currentNumber || "0")
+    }
+    else if (previousNumber) {
+        previousNumber = String(previousNumber).slice(0, -1);
+        updateDisplay(previousNumber || "0")
     }
 }
 document.addEventListener('DOMContentLoaded', () => {
